@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/smui.transition.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/smui.transition.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author @author Guo Mingli(mingli.guo@shenma-inc.com)
+ * @date 2015-1-20
+ * @version 0.0.1
+ * @file DOM元素的过渡属性
+ * @class  smui.transition
+ * @see  {@link http://www.w3cplus.com/content/css3-transition}
+ * @import  zepto.js smui.js 
+ */ 
+(function($, ns) {
+    
+    
+   
+
+    ns.widget('transition', {
+         /**
+         * 设置组件初始化参数
+         * @type {Object}
+         * @memberOf smui.transform
+         * @instance
+         * @property {speed }  speed     参考CSS3 transition-duration      
+         * @property {String}  property  参考CSS3 transition-property， 无素添加前缀    
+
+         * @property {String}  easing    参考CSS3 transition-timing-function     
+
+         * @property {Number}  delay     参考CSS3 transition-delay      
+
+         */
+        options: {
+            speed    : 2000,    //Number  过渡的时间（速度）
+
+            property : '',      //String  要过渡的属性        
+
+            easing   : 'ease',  //String  缓动函数
+
+            delay    : 100      //Number  淡隐淡出的延迟时间
+        },
+        
+        /*
+        ** @description 初始化组件        
+        */        
+        _init : function() {
+            var $el = this.$el,
+
+                opts = this.options;
+
+            $el.css(this.setValue(opts.property,opts.speed,opts.easing,opts.delay));
+            
+        },
+        setValue: function(prop, speed, easing, delay) {
+            !$.isUndefined(prop)   &amp;&amp; this.setProperty(prop);
+            !$.isUndefined(speed)  &amp;&amp; this.setDuration(speed);
+            !$.isUndefined(easing) &amp;&amp; this.setEasing(easing);
+            !$.isUndefined(delay)  &amp;&amp; this.setDelay(delay);
+        },
+        /**
+         * 设置transition-property
+         * @param {String} prop css属性，参考transition-property
+         * @instance
+         * @memberOf smui.transition
+         */
+        setProperty: function(prop){
+            var transitionProperty, valProperty;
+
+            transitionProperty = this.vendors('transition-property');
+            
+            valProperty        = this.vendors(prop);           
+          
+            
+            this._setValue(transitionProperty, valProperty);
+
+           
+        },
+         /**
+         * 设置transition-duration
+         * @param {Number} duration css属性，参考transition-duration
+         * @instance
+         * @memberOf smui.transition
+         */
+        setDuration: function(duration) {
+            var property;
+
+            property = this.vendors('transition-duration');
+
+            this._setValue(property,duration / 1000 + 's');
+        },
+         /**
+         * 设置transition-timing-function 
+         * @param {String} easing css属性，参考transition-timing-function 
+         * @instance
+         * @memberOf smui.transition
+         */
+        setEasing: function(easing){
+            var property;
+
+            property = this.vendors('transition-timing-function');
+
+            this._setValue(property,easing || 'ease');
+        },
+         /**
+         * 设置transition-delay
+         * @param {String} delay css属性，参考transition-delay {@link }
+         * @instance
+         * @memberOf smui.transition
+         */
+        setDelay: function(delay){
+            var property;
+
+            property = this.vendors('transition-delay');
+
+            this._setValue(property,delay / 1000 + 's');
+        },
+        _setValue: function(property,val){
+            var result, isArray, i, len, $el;
+
+            i       =0;
+
+            len     = property.length;
+
+            result  = {};
+            
+            $el     = this.$el;
+
+            isArray = $.isArray(val);
+
+
+            for (; i &lt; len; i++) {
+                result[property[i]] = isArray ? val[i] : val;
+            }
+
+            $el.css(result);
+
+        }
+
+
+
+    });
+
+})(Zepto, smui);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="smui.module_Event.html">Event</a></li><li><a href="smui.module_Tools.html">Tools</a></li></ul><h3>Classes</h3><ul><li><a href="smui.aside.html">smui.aside</a></li><li><a href="smui.carousel.html">smui.carousel</a></li><li><a href="smui.dialog.html">smui.dialog</a></li><li><a href="smui.fadeInOut.html">smui.fadeInOut</a></li><li><a href="smui.history.html">smui.history</a></li><li><a href="smui.layerMask.html">smui.layerMask</a></li><li><a href="smui.lazyImage.html">smui.lazyImage</a></li><li><a href="smui.slider.html">smui.slider</a></li><li><a href="smui.tab.html">smui.tab</a></li><li><a href="smui.transform.html">smui.transform</a></li><li><a href="smui.transition.html">smui.transition</a></li></ul><h3>Events</h3><ul><li><a href="smui.aside.html#event:close">close</a></li><li><a href="smui.aside.html#event:open">open</a></li><li><a href="smui.carousel.html#event:slider">slider</a></li><li><a href="smui.dialog.html#event:cancel">cancel</a></li><li><a href="smui.dialog.html#event:close">close</a></li><li><a href="smui.dialog.html#event:confirm">confirm</a></li><li><a href="smui.dialog.html#event:open">open</a></li><li><a href="smui.fadeInOut.html#event:fadeCompleted">fadeCompleted</a></li><li><a href="smui.layerMask.html#event:maskClose">maskClose</a></li><li><a href="smui.layerMask.html#event:maskLoad">maskLoad</a></li><li><a href="smui.slider.html#event:pulled">pulled</a></li><li><a href="smui.slider.html#event:pulling">pulling</a></li><li><a href="smui.slider.html#event:swipe">swipe</a></li><li><a href="smui.slider.html#event:t-end">t-end</a></li><li><a href="smui.slider.html#event:t-move">t-move</a></li><li><a href="smui.slider.html#event:t-start">t-start</a></li><li><a href="smui.tab.html#.event:beforeSelect">beforeSelect</a></li><li><a href="smui.tab.html#event:select">select</a></li></ul><h3>Namespaces</h3><ul><li><a href="smui.html">smui</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Mon Jan 26 2015 22:47:17 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

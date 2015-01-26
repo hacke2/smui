@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/smui.tab.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/smui.tab.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file tab组件或Navigator组件，具体可由css来控制，如果[data-items]的宽度或高度小于或等于.smui-tab的宽或高的话，slider的滑动会失效
+ * @author Guo Mingli (mingli.guo@shenma-inc.com）
+ * @date 2015-1-20
+ 
+ * @version 0.0.1 
+ * @class smui.tab  
+ * @example
+ * //Html代码
+ *  &lt;div class="smui-tab ">
+            &lt;ul data-items >
+                &lt;li class=" " data-hash='#a1' data-item>
+                    &lt;a data-href="#catelog_abstract" >摘要&lt;/a>
+                &lt;/li>
+                &lt;li data-hash='#b1'  data-item>
+                    &lt;a data-href="#catelog_infobox">基本信息&lt;/a>
+                &lt;/li>
+                &lt;li class="" data-hash='#c1' data-item>
+                    &lt;a data-href="#catelog_1">简介&lt;/a>
+                &lt;/li>               
+            &lt;/ul>
+        &lt;/div>
+ * //Js代码
+ * $('.smui-tab').tab({
+            slider: {
+                direction:"x"
+            },
+            supportHistory: true
+        });
+        $('body').on('select','.smui-tab',function(e,$tab,i){
+            
+            var pane=$('.tab-page').removeClass('current').eq(i);
+            
+            pane.addClass('current');
+        
+        }).on('beforeSelect','.smui-tab',function(e,tab,i){
+            var pane=$('.tab-page').eq(i);
+            
+            if(i!=0 &amp;&amp; typeof pane.data('loaded')=='undefined'){
+                pane.html('正在加载'+i+'号tab……');
+                ~function(i){setTimeout(function(){
+                    pane.html(i+'号tab欢迎您');
+                    pane.data('loaded','loaded');
+                }, 3000)}(i);            
+        }
+    }); *
+ * 
+ **/
+(function($, ns) {
+   
+    ns.widget('tab', {
+
+        /**
+         * 设置组件初始化参数
+         * @memberOf smui.tab
+         * @instance
+         * @type {Object}         
+         * @property {String}  current              当前选中项的标示
+         * @property {null | Object}  slider        是否支持滑动 具体参数值参考smui.slider.js
+         * @property {boolean}  supportHistory      是否支持选项卡与浏览器历史的前进后退关联在一起
+         */
+        options: {
+            current         : 'current',  
+
+            slider          : null,        
+
+            supportHistory  : false     
+        },
+         /**
+         * 初始化组件
+         * @private
+         * @memberOf smui.tab
+         */
+        _init: function() {
+
+            var me,$el,opts,eventNS,current;
+
+            me             = this;
+
+            $el            = this.$el;
+
+            opts           = me.options;
+
+            eventNS        = me.eventNS;
+            
+            current        =  opts.current.replace(/^\./, ''),
+
+            this.$tab      = $el.find('[data-items]')
+
+            this.$tabs     = $el.find('[data-item]');         
+
+            //根据用户设定的当前标示，设定当前索引
+            this.index     = $.inArray($el.find('.' + current).get(0), this.$tabs);
+
+            //如果用户没有指定当前标示，则默认选中第一个
+            if (this.index === -1) {
+
+                this.$tabs.eq(0).addClass('current');
+
+                this.index = 0;
+
+            }        
+           
+
+            $el.off(eventNS).on('click' + eventNS, '[data-Item]', function(e) {
+               /* me.$tab.slider('moveToElement',$(this));*/
+               !opts.supportHistory &amp;&amp; me._switchTo($(this).index(), e);
+
+            });      
+
+            //支持slider,则注册。
+            if ($.isPlainObject(opts.slider)) {
+
+                me._openSlider(opts.slider);
+            
+            }    
+
+            if (opts.supportHistory) {
+                me._openHistory();
+            }
+        },
+
+         /**
+         * 使组件支持slider
+         * @private
+         */      
+        _openSlider: function(options) {
+            var $el, opts, $tab, eventNS, me;
+
+            me      = this;
+            
+            $el     = this.$el;
+            
+            opts    = this.options;
+            
+            $tab    = this.$tab;
+            
+            eventNS = this.eventNS;
+
+            if (!this.isSlider) {
+                $tab.slider(options || {});
+
+                $tab.off(eventNS).on('t-start' + eventNS, function(e, pos, flag) {
+
+                    me.trigger('t-start', [pos, flag]);
+
+                }).on('t-move' + eventNS, function(e, pos, flag) {
+
+                    me.trigger('t-start', [pos, flag]);
+
+                }).on('t-end' + eventNS, function(e, pos, flag) {
+
+                    me.trigger('t-end', [pos, flag]);
+
+                }).on('swipeRight' + eventNS, function(e, pos) {
+
+                    me.trigger('swipeRight', pos);
+
+                }).on('swipeLeft' + eventNS, function(e, pos) {
+
+                    me.trigger('swipeLeft', pos);
+
+                }).on('pulling'+eventNS,function(e,flag){
+                    console.log(flag);
+                }).on('pulled'+eventNS,function(e,flag){
+                    console.log(flag);
+                });
+            }
+
+            this.isSlider = true;
+        },
+        /**
+         * 使得选项卡与浏览器历史的前进后退关联在一起 
+         * @private
+         */        
+        _openHistory: function() {
+            var me, $el,eventNS;
+
+             me         = this,
+
+             $el        = this.$el,
+
+             eventNS    = this.eventNS;
+
+             me.history = true;
+
+            if (ns.isExistWidget('history')) {
+
+                $el.history();
+
+                $el.on('history' + eventNS, this.options.tabs, function(e, i, h) {
+
+                    me._switchTo(i, e);
+
+                });
+                //$el.history('hashChange');              
+                
+            } else {
+                throw new Error('The lack of dependent files smui.history.js');
+            }
+        },
+        /**
+         * 切换到指定的选项
+         * @private
+         * @param {Number} index 序号
+         *  
+         */
+        _switchTo: function(i, e, triggerHistory) {
+            var me = this,
+                $scope = this.$el,
+                opts = me.options,
+                current = opts.current.replace(/^\./, ''),
+                eventNS = this.eventNS,
+                $tab = me.getTabByIndex(i);
+               
+
+
+            if ($tab.length == 0) {
+                throw new Error('The tab index is out of range');
+            }
+
+            $.isPlainObject(opts.slider) &amp;&amp; me.$tab.slider('moveToElement',$tab,null,true);
+            
+            this.index = i;
+            
+            /**
+             * 切换tab完成前触发
+             * @event beforeSelect
+             * @memberOf smui.tab
+             */
+            me.trigger('beforeSelect', [$tab, i]);
+
+            me.$tabs.removeClass(current);
+
+
+            //
+
+            $tab.addClass(current);
+
+            /**
+             * 切换tab完成后触发
+             * @event select
+             * @instance
+             * @memberOf smui.tab
+             */
+            me.trigger('select', [$tab, i]);
+        },
+        /**
+         * 切换到导航栏的某一项
+         * @param {Number} index 序号
+         * @public
+         * @instance
+         * @fires beforeSelect
+         * @fires select
+         * @memberOf smui.tab
+         * @example
+         * $('.smui-tab').tab("switchTo",3);
+         * //或
+         * var tab = new smui.tab($('.smui-tab'),{});
+         * tab.switchTo(3);
+         */
+        switchTo: function(index) {
+            return this._switchTo(index);
+        },
+        /**
+         * 获取当前选中的序号
+         * @memberOf smui.tab
+         * @instance
+         * @return {Number} 当前选中项的索引
+         */
+        getIndex: function() {
+            return this.index;
+        },
+        /**
+         * 获取所有的tab
+         * @memberOf smui.tab
+         * @instance
+         * @return {Array} 所有的tab
+         */
+        getTabs: function() {
+            return this.$tabs;
+        },
+        /**
+         * 根据索引号获取tab
+         * @memberOf smui.tab
+         * @instance
+         * @param  {Number} i 索引号
+         * @return {Object}   指定的tab的DOM对像
+         */
+        getTabByIndex: function(i) {
+            var tabs = this.$tabs;
+            if (i > tabs.length || i &lt; 0) {
+                return null;
+            }
+            return tabs.eq(i);
+        },
+        /**
+         * 获取当前tab
+         * @memberOf smui.tab
+         * @instance
+         * @return {Object} 当前tab的DOM对像
+         */
+        getCurrentTab: function() {
+            var index = this.getIndex();
+            return this.getTabByIndex(index);
+        },
+        /**
+         * 切换至下一个tab
+         * @instance
+         * @memberOf smui.tab
+         */
+        next: function() {
+            var index = this.getIndex() + 1
+                //index &lt; this.getLen() &amp;&amp; this.switchTo(index);
+                //
+            index &lt; this.getLen() &amp;&amp; this.getTabByIndex(index).trigger('click');
+
+        },
+        /**
+         * 切换至上一个tab
+         * @instance
+         * @memberOf smui.tab
+         */
+        prev: function() {
+            var index = this.getIndex() - 1
+                //index >= 0 &amp;&amp; this.switchTo(index);
+            index >= 0 &amp;&amp; this.getTabByIndex(index).trigger('click');
+        },      
+        /**
+         * 获取tab的个数
+         * @instance
+         * @memberOf smui.tab
+         */
+        getLen: function() {
+            return this.getTabs().length;
+        },
+        /**
+         * 释放内存
+         * @alias destroy
+         * @instance
+         * @memberOf smui.tab
+         */
+        _destroy: function() {
+            var eventNS = this.eventNS;
+            
+            this.$tab.off(eventNS);
+
+            this.historyTool &amp;&amp; this.historyTool.destroy();
+            
+            this.isSlider &amp;&amp; this.$tab.slider('destroy');
+        }
+    });
+})($, smui);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="smui.module_Event.html">Event</a></li><li><a href="smui.module_Tools.html">Tools</a></li></ul><h3>Classes</h3><ul><li><a href="smui.aside.html">smui.aside</a></li><li><a href="smui.carousel.html">smui.carousel</a></li><li><a href="smui.dialog.html">smui.dialog</a></li><li><a href="smui.fadeInOut.html">smui.fadeInOut</a></li><li><a href="smui.history.html">smui.history</a></li><li><a href="smui.layerMask.html">smui.layerMask</a></li><li><a href="smui.lazyImage.html">smui.lazyImage</a></li><li><a href="smui.slider.html">smui.slider</a></li><li><a href="smui.tab.html">smui.tab</a></li><li><a href="smui.transform.html">smui.transform</a></li><li><a href="smui.transition.html">smui.transition</a></li></ul><h3>Events</h3><ul><li><a href="smui.aside.html#event:close">close</a></li><li><a href="smui.aside.html#event:open">open</a></li><li><a href="smui.carousel.html#event:slider">slider</a></li><li><a href="smui.dialog.html#event:cancel">cancel</a></li><li><a href="smui.dialog.html#event:close">close</a></li><li><a href="smui.dialog.html#event:confirm">confirm</a></li><li><a href="smui.dialog.html#event:open">open</a></li><li><a href="smui.fadeInOut.html#event:fadeCompleted">fadeCompleted</a></li><li><a href="smui.layerMask.html#event:maskClose">maskClose</a></li><li><a href="smui.layerMask.html#event:maskLoad">maskLoad</a></li><li><a href="smui.slider.html#event:pulled">pulled</a></li><li><a href="smui.slider.html#event:pulling">pulling</a></li><li><a href="smui.slider.html#event:swipe">swipe</a></li><li><a href="smui.slider.html#event:t-end">t-end</a></li><li><a href="smui.slider.html#event:t-move">t-move</a></li><li><a href="smui.slider.html#event:t-start">t-start</a></li><li><a href="smui.tab.html#.event:beforeSelect">beforeSelect</a></li><li><a href="smui.tab.html#event:select">select</a></li></ul><h3>Namespaces</h3><ul><li><a href="smui.html">smui</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Mon Jan 26 2015 22:47:17 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

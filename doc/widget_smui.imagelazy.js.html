@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/smui.imagelazy.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/smui.imagelazy.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+
+/**
+ * @file 图片的懒加载
+ * @author Guo Mingli(mingli.guo@shenma-inc.com)
+ * @date 2015-01-20
+ * @class smui.lazyImage 
+ * @version 0.0.1
+ * @import  zepto.js smui.js smui.transition.js
+ *
+ * @example
+*       &lt;div class="smui-lazy-img"  >
+            &lt;img data-lazy-img data-src="http://s2.zimgs.cn/ims?kt=url&amp;amp;at=ori&amp;amp;tv=0_0&amp;amp;sign=yx:H04ZQvxARNg7plzPP0uv6kEXsgo=&amp;amp;key=aHR0cDovL2E0LmF0dC5odWRvbmcuY29tLzA3Lzg4LzAxMzAwNTQyNTcwMzkwMTQwNzc1ODgwMDY4NTEzX3MuanBn&amp;amp;x.jpg">
+            &lt;span class="loading" data-img-loading> &lt;i>正在加载&lt;/i>
+            &lt;/span>
+        &lt;/div>
+
+        $('body').lazyImage();
+
+ */
+(function($, ns) {
+
+    ns.widget('lazyImage', {
+        /**
+         * 设置组件初始化参数
+         * @type {Object}
+         * @memberOf smui.lazyImage
+         * @instance
+         * @property {Object}  effect     图片懒加载时的效果，目前暂时只有fade一种。
+         * @property {Object}  loading    图片loading的淡隐淡出参数
+         * @property {Boolean}   isScrollLoad 页面滚动时是否懒加载图片         
+         */
+        options: {
+            effect: {
+                name : 'fade',
+
+                param : {
+
+                    speed   : 500,    //Number  淡隐淡出的时间（速度）
+
+                    opacity : [0, 1],  //Array   淡隐淡出的透明度     
+
+                    easing  : 'ease',  //String  缓动函数
+
+                    delay   : 100      //Number  淡隐淡出的延迟时间
+                }
+
+            },
+
+            loading:{
+                speed   : 100,    //Number  淡隐淡出的时间（速度）
+
+                opacity : [1, 0],  //Array   淡隐淡出的透明度     
+
+                easing  : 'ease',  //String  缓动函数
+
+                delay   : 0        //Number  淡隐淡出的延迟时间
+
+            },
+
+            isScrollLoad: false
+        },
+        /*
+         ** @description 初始化组件
+         */
+        _init: function() {
+
+            var me, $el, opts;
+
+            me = this;
+
+            $el = this.$el;
+
+            opts = this.options;
+
+            opts.isScrollLoad &amp;&amp; $(window).off(eventNS).on('scroll' + eventNS, function(e) {
+                me.lazy();
+            });
+
+            me.lazy();
+        },
+
+        lazy: function($images) {
+            
+            var me, $imgs, opts, src;
+
+            me = this;
+
+            opts = this.options;
+
+            $imgs = ($images &amp;&amp; $images.length >0) ? $images : this.$el.find('[data-lazy-img]');
+
+            $imgs.each(function(i,v) {
+                var $this, img, src;
+
+                $this = $(v);
+
+                $this.hide();
+
+                img = new Image();
+
+                img.onerror = function() {
+
+                    me.trigger('img-error', [v, src]);
+
+                    $this.hide();
+                };
+
+                img.onload = function() {
+
+                    $this.attr('src',src);
+
+                    me[opts.effect.name]($this);
+
+                    me.trigger('img-load', [v, src]);
+                };
+
+                src = $this.data('src');
+
+                if (src === '') {
+
+                    $this.hide();
+
+                } else {
+
+                    img.src = src;
+
+                }
+
+
+
+            });
+
+        },
+        fade: function($obj) {
+
+            var opts,$loading;
+
+            if (smui.isExistWidgetInDom('fadeInOut',$obj))
+            {
+                return ;
+            }
+
+            opts = this.options;
+
+            $obj.fadeInOut(opts.effect.param);
+
+            $obj.fadeInOut('show');
+
+            $loading = $obj.parent().find('[data-img-loading]');
+
+            $loading.fadeInOut(opts.loading);
+
+            $loading.fadeInOut('show');
+
+        },
+
+        _destroy: function() {
+
+            $(window).off(eventNS);
+
+        }
+
+
+    });
+
+})(Zepto, smui);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="smui.module_Event.html">Event</a></li><li><a href="smui.module_Tools.html">Tools</a></li></ul><h3>Classes</h3><ul><li><a href="smui.aside.html">smui.aside</a></li><li><a href="smui.carousel.html">smui.carousel</a></li><li><a href="smui.dialog.html">smui.dialog</a></li><li><a href="smui.fadeInOut.html">smui.fadeInOut</a></li><li><a href="smui.history.html">smui.history</a></li><li><a href="smui.layerMask.html">smui.layerMask</a></li><li><a href="smui.lazyImage.html">smui.lazyImage</a></li><li><a href="smui.slider.html">smui.slider</a></li><li><a href="smui.tab.html">smui.tab</a></li><li><a href="smui.transform.html">smui.transform</a></li><li><a href="smui.transition.html">smui.transition</a></li></ul><h3>Events</h3><ul><li><a href="smui.aside.html#event:close">close</a></li><li><a href="smui.aside.html#event:open">open</a></li><li><a href="smui.carousel.html#event:slider">slider</a></li><li><a href="smui.dialog.html#event:cancel">cancel</a></li><li><a href="smui.dialog.html#event:close">close</a></li><li><a href="smui.dialog.html#event:confirm">confirm</a></li><li><a href="smui.dialog.html#event:open">open</a></li><li><a href="smui.fadeInOut.html#event:fadeCompleted">fadeCompleted</a></li><li><a href="smui.layerMask.html#event:maskClose">maskClose</a></li><li><a href="smui.layerMask.html#event:maskLoad">maskLoad</a></li><li><a href="smui.slider.html#event:pulled">pulled</a></li><li><a href="smui.slider.html#event:pulling">pulling</a></li><li><a href="smui.slider.html#event:swipe">swipe</a></li><li><a href="smui.slider.html#event:t-end">t-end</a></li><li><a href="smui.slider.html#event:t-move">t-move</a></li><li><a href="smui.slider.html#event:t-start">t-start</a></li><li><a href="smui.tab.html#.event:beforeSelect">beforeSelect</a></li><li><a href="smui.tab.html#event:select">select</a></li></ul><h3>Namespaces</h3><ul><li><a href="smui.html">smui</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Mon Jan 26 2015 22:47:17 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

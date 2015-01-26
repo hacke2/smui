@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/smui.transform.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/smui.transform.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file DOM元素的变形CSS
+ * @author Guo Mingli(mingli.guo@shenma-inc.com)
+ * @date 2015-1-20
+ * @version 0.0.1
+ * @class smui.transform 
+ * @see  {@link http://www.w3cplus.com/css3/css3-3d-transform.html}
+
+ * @import  zepto.js smui.js 
+ */ 
+(function($, ns) {
+
+    ns.widget('transform', {      
+        /**
+         * 设置组件初始化参数
+         * @type {Object}
+         * @memberOf smui.transform
+         * @instance
+         * @property {Boolean}  is3d   是否是3D版的属性，默认true        
+         */
+        options:{
+            is3d : true
+        },     
+
+        /*
+        ** @description 初始化组件        
+        */        
+        _init : function() {
+           
+            this.support3D = this.options.is3d;   
+
+            this.prop = this.vendors('transform');                    
+        },
+
+        _setValue: function(str){
+
+            var result, i, len, $el, property;
+
+            i        = 0;
+
+            property = this.prop;
+
+            len      = property.length;
+            
+            result   = {};
+            
+            $el      = this.$el;          
+
+
+            for (; i &lt; len; i++) {
+
+                result[property[i]] = str;
+
+            }
+
+            $el.css(result);
+        },
+        /**
+         * 平移
+         * @param  {Number} x  用来指定元素X轴方向平移距离
+         * @param  {Number} y  用来指定元素Y轴方向平移距离
+         * @param  {Number} z  用来指定元素Z轴方向平移距离
+         * @instance
+         * @memberOf smui.transform
+         */
+        translate: function(x,y,z) {      
+
+            this._build('translate',x,y,z,'px',0);
+           
+        },
+        /**
+         * 缩放
+         * @param  {Number} x  横向缩放比例
+         * @param  {Number} y  纵向缩放比例
+         * @param  {Number} z  Z轴缩放比例
+         * @instance
+         * @memberOf smui.transform
+         */
+        scale: function(x,y,z) {
+          
+
+            this._build('scale',x,y,z,'',1);
+        },
+         /**
+         * 倾斜是二维变形，不能在三维空间变形。元素可能会在X轴和Y轴倾斜，然后转化为三维，但它们不能在Z轴倾斜。
+         * @param  {Number} x  用来指定元素X轴方向倾斜的角度。
+         * @param  {Number} y  用来指定元素Y轴方向倾斜的角度。         
+         * @instance
+         * @memberOf smui.transform
+         */
+        skew:function(x,y){
+            this._build('skew',x,y,undefined,'deg',0,false);
+        },
+        /**
+         * 旋转,旋转的量被定义为指定的角度；如果值为正值，元素围绕Y轴顺时针旋转；反之，如果值为负值，元素围绕Y轴逆时针旋转
+         * @param  {Number} x  元素围绕X轴旋转
+         * @param  {Number} y  元素围绕Y轴旋转
+         * @param  {Number} z  元素围绕Z轴旋转     
+         * @instance
+         * @memberOf smui.transform 
+         */
+        rotate: function(x,y,z){
+      
+
+            this._build('rotate',x,y,z,'deg',0);
+        },
+
+        _build:function(prop,x,y,z,unit,init,is3D){
+             var str,format;
+
+             is3D = $.isUndefined(is3D) ? this.support3D :is3D;
+
+            if (is3D) {
+
+                format = prop + '3d({0},{1},{2})';
+            } else {
+
+                format = prop + '({0},{1})';
+            }
+            
+           
+            if (typeof x === 'undefined') {
+                x = init;
+            }
+            if (typeof y === 'undefined') {
+                y = init;
+            }
+            if (typeof z === 'undefined') {
+                z = init;
+            }
+
+            str = ns.Tools.format(format, x+unit, y+unit, z+unit);
+
+            this._setValue(str);
+        }
+
+
+
+    });
+
+})(Zepto, smui);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="smui.module_Event.html">Event</a></li><li><a href="smui.module_Tools.html">Tools</a></li></ul><h3>Classes</h3><ul><li><a href="smui.aside.html">smui.aside</a></li><li><a href="smui.carousel.html">smui.carousel</a></li><li><a href="smui.dialog.html">smui.dialog</a></li><li><a href="smui.fadeInOut.html">smui.fadeInOut</a></li><li><a href="smui.history.html">smui.history</a></li><li><a href="smui.layerMask.html">smui.layerMask</a></li><li><a href="smui.lazyImage.html">smui.lazyImage</a></li><li><a href="smui.slider.html">smui.slider</a></li><li><a href="smui.tab.html">smui.tab</a></li><li><a href="smui.transform.html">smui.transform</a></li><li><a href="smui.transition.html">smui.transition</a></li></ul><h3>Events</h3><ul><li><a href="smui.aside.html#event:close">close</a></li><li><a href="smui.aside.html#event:open">open</a></li><li><a href="smui.carousel.html#event:slider">slider</a></li><li><a href="smui.dialog.html#event:cancel">cancel</a></li><li><a href="smui.dialog.html#event:close">close</a></li><li><a href="smui.dialog.html#event:confirm">confirm</a></li><li><a href="smui.dialog.html#event:open">open</a></li><li><a href="smui.fadeInOut.html#event:fadeCompleted">fadeCompleted</a></li><li><a href="smui.layerMask.html#event:maskClose">maskClose</a></li><li><a href="smui.layerMask.html#event:maskLoad">maskLoad</a></li><li><a href="smui.slider.html#event:pulled">pulled</a></li><li><a href="smui.slider.html#event:pulling">pulling</a></li><li><a href="smui.slider.html#event:swipe">swipe</a></li><li><a href="smui.slider.html#event:t-end">t-end</a></li><li><a href="smui.slider.html#event:t-move">t-move</a></li><li><a href="smui.slider.html#event:t-start">t-start</a></li><li><a href="smui.tab.html#.event:beforeSelect">beforeSelect</a></li><li><a href="smui.tab.html#event:select">select</a></li></ul><h3>Namespaces</h3><ul><li><a href="smui.html">smui</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Mon Jan 26 2015 22:47:17 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

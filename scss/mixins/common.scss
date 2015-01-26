@@ -1,0 +1,41 @@
+$vendors : -webkit;
+//
+@mixin ellipsis($line) {
+    overflow: hidden;
+    
+    text-overflow: ellipsis;
+    
+    @include v-vendors(display,box);
+
+    white-space: nowrap;
+}
+
+@mixin vendors($attr,$value){
+    @each $p in $vendors{
+        #{$p}-#{$attr}:$value;
+    }
+    #{$attr}:$value;
+}
+
+@mixin v-vendors($attr,$value){  
+    
+    @each $p in $vendors{
+        #{$attr}:#{$p}-$value;
+    }
+    
+    #{$attr}:$value;
+    
+}
+
+@mixin transform($attr:rotate,$value:0deg,$orgin:center center)
+{
+    @include vendors(transform,unquote($attr+'('+$value+')'));
+    @if($orgin!=(center center))
+    {
+        @include vendors(transform-origin,$orgin);
+    }
+}
+
+@mixin box-sizing($boxmodel){
+    @include vendors(box-sizing,$boxmodel);
+}

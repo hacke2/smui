@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/smui.history.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/smui.history.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file 用于实现组件与浏览器前进后退相关联,主要利用hashChange来实现
+ * @author Guo Mingli(mingli.guo@shenma-inc.com)
+ * @date 2015-01-20
+ * @class smui.history
+ * @version 0.0.1
+ * @import smui.js 
+ */
+
+(function($, ns) {
+    'use strict'
+
+    ns.widget('history', {
+
+        options: {
+            renderTo:'li'
+        },
+
+        _init: function() {
+
+            var $els, me, eventNS;
+
+            me      = this;
+            
+            eventNS = this.eventNS;
+            
+            $els    = this.$els = this.$el.find(this.options.renderTo);
+
+            this.eleHasHash();
+
+            $(window).on('hashchange', function(e) {
+
+                me.hashChange();
+
+            }).on('hash', function(e, h) {
+
+                 if (h) {
+
+                    $els.each(function(i, v) {
+
+                        var _hash = me.getHash($(this));
+
+                        if (_hash.indexOf('#') != 0) {
+
+                            _hash = '#' + _hash;
+
+                        }
+
+                        if (_hash == h) {
+
+                            $(this).trigger("history", [i, h]);
+                        }
+
+                    });
+                } else {
+                 
+                    $els.eq(0).trigger("history", [0, me.getHash($els.eq(0))]);
+                
+                }
+                me.hash = h;                
+
+            })
+
+            $els.off(eventNS).on('click' + eventNS, function(e) {
+                location.hash = me.getHash($(this));
+            });
+
+
+            this.hashChange();
+
+        },
+        /*
+         ** @description 检测是用户是否有data-hash,没有则用newId生成唯一hash
+         */
+        eleHasHash: function() {
+            var $els,me;
+
+            $els = this.$els;
+
+            me  = this;
+
+            $els.each(function(i, v) {
+                var hash, $v;
+
+                $v = $(v);
+
+                hash = me.getHash($v);
+
+                if (!hash) {
+
+                    $v.data('hash', ns.Tools.newId());
+
+                }
+
+            });
+
+        },
+
+        hashChange: function() {
+            var h = location.hash;
+
+            if (this.hash != h) {
+
+                //解决hashChange解发，但有些处理逻辑没有加载的问题，                
+                setTimeout(function(){
+                    $(window).trigger('hash', h);
+                }, 16);
+                
+            }
+        },
+
+        getHash: function($el) {
+            var _h= $el.data('hash') || $el.data('href');
+
+            return $.type(_h) === 'number' ? _h+'' : _h;
+        },
+        _destroy: function(){
+            $(window).off('hashchange').off('hash');
+        }
+
+    });
+
+})(Zepto, smui);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="smui.module_Event.html">Event</a></li><li><a href="smui.module_Tools.html">Tools</a></li></ul><h3>Classes</h3><ul><li><a href="smui.aside.html">smui.aside</a></li><li><a href="smui.carousel.html">smui.carousel</a></li><li><a href="smui.dialog.html">smui.dialog</a></li><li><a href="smui.fadeInOut.html">smui.fadeInOut</a></li><li><a href="smui.history.html">smui.history</a></li><li><a href="smui.layerMask.html">smui.layerMask</a></li><li><a href="smui.lazyImage.html">smui.lazyImage</a></li><li><a href="smui.slider.html">smui.slider</a></li><li><a href="smui.tab.html">smui.tab</a></li><li><a href="smui.transform.html">smui.transform</a></li><li><a href="smui.transition.html">smui.transition</a></li></ul><h3>Events</h3><ul><li><a href="smui.aside.html#event:close">close</a></li><li><a href="smui.aside.html#event:open">open</a></li><li><a href="smui.carousel.html#event:slider">slider</a></li><li><a href="smui.dialog.html#event:cancel">cancel</a></li><li><a href="smui.dialog.html#event:close">close</a></li><li><a href="smui.dialog.html#event:confirm">confirm</a></li><li><a href="smui.dialog.html#event:open">open</a></li><li><a href="smui.fadeInOut.html#event:fadeCompleted">fadeCompleted</a></li><li><a href="smui.layerMask.html#event:maskClose">maskClose</a></li><li><a href="smui.layerMask.html#event:maskLoad">maskLoad</a></li><li><a href="smui.slider.html#event:pulled">pulled</a></li><li><a href="smui.slider.html#event:pulling">pulling</a></li><li><a href="smui.slider.html#event:swipe">swipe</a></li><li><a href="smui.slider.html#event:t-end">t-end</a></li><li><a href="smui.slider.html#event:t-move">t-move</a></li><li><a href="smui.slider.html#event:t-start">t-start</a></li><li><a href="smui.tab.html#.event:beforeSelect">beforeSelect</a></li><li><a href="smui.tab.html#event:select">select</a></li></ul><h3>Namespaces</h3><ul><li><a href="smui.html">smui</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha13</a> on Mon Jan 26 2015 22:47:17 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

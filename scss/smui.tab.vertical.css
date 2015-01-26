@@ -1,0 +1,39 @@
+.smui-tab {
+  font-size: 14px;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 56px;
+  height: 30px;
+  line-height: 30px;
+  background: #f6f6f6; }
+
+.smui-tab > [data-items] {
+  display: table;
+  height: 100%;
+  margin: 0;
+  white-space: nowrap; }
+
+.smui-tab [data-item] {
+  line-height: inherit;
+  position: relative;
+  display: table-cell;
+  overflow: hidden;
+  height: 100%;
+  text-align: center;
+  vertical-align: top;
+  color: #424242; }
+
+.smui-tab [data-item] > a {
+  position: relative;
+  display: inline-block;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0 7px;
+  text-align: center;
+  color: inherit; }
+
+.smui-tab .current > a {
+  color: #ff8400; }
